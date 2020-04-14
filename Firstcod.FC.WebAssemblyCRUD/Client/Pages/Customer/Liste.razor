@@ -1,0 +1,58 @@
+﻿@page "/customer/liste"
+@inject HttpClient Http
+@inject IJSRuntime jsRuntime
+
+<h3>Members List</h3>
+<hr />
+
+@if (_memberList.Count() == 0)
+{
+    <div class="row">
+        Data notfound..
+    </div>
+}
+else
+{
+    <div class="row">
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Email Address</th>
+                <th>Update Date</th>
+                <th>Create Date</th>
+            </tr>
+            @foreach (var item in _memberList)
+            {
+                <tr>
+                    <td>@item.Name @item.LastName</td>
+                    <td>@item.EmailAddress</td>
+                    <td>@item.UpdateDate</td>
+                    <td>@item.CreateDate</td>
+                </tr>
+            }
+        </table>
+
+    </div>
+}
+
+@code {
+
+    public List<Member> _memberList = new List<Member>();
+
+    public async Task GetMember() =>
+        _memberList = await Http.GetJsonAsync<List<Member>>("Members");
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetMember();
+    }
+
+    [JSInvokable]
+    public async void UpdateListe()
+    {
+        await GetMember();
+
+        StateHasChanged();
+    }
+}

@@ -1,0 +1,73 @@
+﻿@page "/customer/edit"
+@page "/customer/edit/{Id}"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Edit Member @Id</h3>
+<hr />
+
+<div class="row">
+    <EditForm Model="_member" OnValidSubmit="@(async () => await EditMember())" class="col s12">
+        <div class="row">
+            <div class="input-group col s6">
+                <label for="first_name">First Name</label>
+                <input id="first_name" type="text" @bind-value="_member.Name" class="form-control" required />
+            </div>
+            <div class="input-group col s6">
+                <label for="last_name">Last Name</label>
+                <input id="last_name" type="text" @bind-value="_member.LastName" class="form-control" required />
+            </div>
+        </div>
+        @*<div class="row">
+            <div class="input-group col s12">
+                <label for="password">Password</label>
+                <input id="password" type="password" class="form-control" required />
+            </div>
+        </div>*@
+        <div class="row">
+            <div class="input-group col s12">
+                <label for="email">Email</label>
+                <input id="email" type="email" @bind-value="_member.EmailAddress" class="form-control" required />
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group col s12">
+                <label>
+                    <input type="checkbox" required />
+                    <span>I Agree</span>
+                </label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="input-group col s12">
+                <button class="btn waves-effect waves-light right" type="submit" name="action">
+                    Update
+                    <i class="material-icons right">send</i>
+                </button>
+            </div>
+        </div>
+    </EditForm>
+</div>
+
+@code {
+
+    [Parameter]
+    public string Id { get; set; }
+
+    private Member _member = new Member();
+
+    private async Task GetMember() =>
+        _member = await Http.GetJsonAsync<Member>($"Members/{long.Parse(Id)}");
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetMember();
+    }
+
+    private async Task EditMember()
+    {
+        await Http.PutJsonAsync($"Members/{long.Parse(Id)}", _member);
+
+        Navigation.NavigateTo("/customer/create");
+    }
+}
